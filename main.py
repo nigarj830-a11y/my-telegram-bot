@@ -27,14 +27,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.5-flash',
             contents=user_message,
         )
         await update.message.reply_text(response.text)
     except Exception as e:
         error_msg = str(e)
         print(f"Error: {error_msg}")
-        await update.message.reply_text(f"Error aa gaya: {error_msg}")
+        try:
+            # Fallback agar pehla model na chale
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=user_message,
+            )
+            await update.message.reply_text(response.text)
+        except Exception as e2:
+            await update.message.reply_text(f"Error aa gaya: {str(e2)}")
 
 def main():
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
