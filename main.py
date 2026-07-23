@@ -18,27 +18,28 @@ server_thread.start()
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
-import google.generativeai as genai
+from google import genai
 
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+# Configure API
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Configure APIs
-TELEGRAM_TOKEN = "8962203882:AAFbTTNrPrU_zuLYUo3NJT_yY_vn8UBkLAg"
-GEMINI_API_KEY = "AIzaSyDg7pjUBqggvuP0LS97FrXdrEaQWpgtDVs"
-
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Naya google-genai client initialize kar rahe hain
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
-        response = model.generate_content(user_message)
+        # Naye SDK ka use karke Gemini se response le rahe hain
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=user_message,
+        )
         await update.message.reply_text(response.text)
     except Exception as e:
+        print(f"Error: {e}")
         await update.message.reply_text("Maaf kijiye, kuch error aa gaya hai.")
+
 
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
