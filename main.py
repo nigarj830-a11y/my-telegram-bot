@@ -32,11 +32,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text(response.text)
     except Exception as e:
-        print(f"Error: {e}")
-        await update.message.reply_text("Maaf kijiye, kuch error aa gaya hai.")
+        error_msg = str(e)
+        print(f"Error: {error_msg}")
+        await update.message.reply_text(f"Error aa gaya: {error_msg}")
 
 def main():
-    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).read_timeout(30).connect_timeout(30).build()
+    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     
     print("Bot is running...")
